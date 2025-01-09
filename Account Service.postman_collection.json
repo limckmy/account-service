@@ -1,0 +1,223 @@
+{
+	"info": {
+		"_postman_id": "1625cbba-79fe-4765-a13b-502e8bd55fc5",
+		"name": "Account Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "3169392"
+	},
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Find User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/v1/users/manager",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"users",
+								"manager"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"bob\",\r\n    \"password\" : \"password123\",\r\n    \"email\" : \"bob@limckmy.org\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/users/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonResponse = pm.response.json();\r",
+									"pm.environment.set(\"token\", jsonResponse.accessToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\" : \"manager\",\r\n    \"password\" : \"abc\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/users/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"users",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Account",
+			"item": [
+				{
+					"name": "Find record",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiJtYW5hZ2VyIiwiaXNzIjoib3JnLmxpbWNrbXkiLCJleHAiOjE3MzYzOTM4MDl9.rotG1bYwwBunSVyIV-95ce06hXK6iHW18zE7TWCekpn7ZPDRjPZ2uFM9BMTQF8kZYLhy7i3AlTymCFkDhBqjDYNl5m2YOJJb71vMkTPV41eLHLetH4nQvVUgdyXmA62CX-0_GJZmnERc22zBLVRONkkfnWTqZ_h075j86NusKUMDhXeaj5jEEDqYKf2N4zWUK2nDN1XpBSrAd6N7Kj4Rp2kf_CApmMy_H5ic5yg3XGFCzkYAdqv-JaVLUVtHSTz6Uk7rYkAA7mZzwpa2QtFTj6_U1bYqX2Or6jw6PfEa2LnCm7wjOIhBqrktnpZfkGsXdl4qAWSD0-TrHNRtxwu9NQ",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/accounts/search?accountNumber=ACC1001",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"accounts",
+								"search"
+							],
+							"query": [
+								{
+									"key": "accountNumber",
+									"value": "ACC1001"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upadet Description",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"Primary saving account updated\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/v1/accounts/1/description",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"v1",
+								"accounts",
+								"1",
+								"description"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Create user table -->
+    <changeSet id="1" author="system">
+        <createTable tableName="app_user">
+            <column name="user_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="username" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints unique="true" nullable="false"/>
+            </column>
+            <column name="password_hash" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP"/>
+            <column name="is_active" type="BOOLEAN" defaultValue="true"/>
+            <column name="is_verified" type="BOOLEAN" defaultValue="false"/>
+            <column name="version" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="system">
+        <createSequence sequenceName="seq_user_id" startValue="1" incrementBy="1"/>
+    </changeSet>
+
+
+    <!-- Create customer table -->
+    <changeSet id="3" author="system">
+        <createTable tableName="customer">
+            <column name="customer_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="phone" type="VARCHAR(15)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="version" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Create account table -->
+    <changeSet id="4" author="system">
+        <createTable tableName="account">
+            <column name="account_id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="account_number" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="balance" type="DECIMAL(15, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_description" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="version" type="integer" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <!-- Foreign key to link the account to a customer -->
+            <column name="customer_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Add foreign key constraint to account table -->
+    <changeSet id="5" author="system">
+        <addForeignKeyConstraint
+                constraintName="fk_account_customer"
+                baseTableName="account"
+                baseColumnNames="customer_id"
+                referencedTableName="customer"
+                referencedColumnNames="customer_id"
+                onDelete="CASCADE"
+        />
+    </changeSet>
+
+
+
+    <!-- Create index on customer_id -->
+    <changeSet id="6" author="system">
+        <createIndex indexName="idx_customer_id" tableName="account">
+            <column name="customer_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create index on account_number -->
+    <changeSet id="7" author="system">
+        <createIndex indexName="idx_account_number" tableName="account">
+            <column name="account_number"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create composite index on customer_id and account_number -->
+    <changeSet id="8" author="system">
+        <createIndex indexName="idx_customer_account" tableName="account">
+            <column name="customer_id"/>
+            <column name="account_number"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create composite index on customer_id and account_description -->
+    <changeSet id="9" author="system">
+        <createIndex indexName="idx_customer_description" tableName="account">
+            <column name="customer_id"/>
+            <column name="account_description"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Create composite index on account_number and account_description -->
+    <changeSet id="10" author="system">
+        <createIndex indexName="idx_account_description" tableName="account">
+            <column name="account_number"/>
+            <column name="account_description"/>
+        </createIndex>
+    </changeSet>
+
+
+    <!-- ChangeSet to create BATCH_JOB_INSTANCE table -->
+    <changeSet id="1" author="system_batch">
+        <createTable tableName="BATCH_JOB_INSTANCE">
+            <column name="JOB_INSTANCE_ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT"/>
+            <column name="JOB_NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="JOB_KEY" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint
+                tableName="BATCH_JOB_INSTANCE"
+                columnNames="JOB_NAME, JOB_KEY"
+                constraintName="JOB_INST_UN"/>
+    </changeSet>
+
+    <!-- ChangeSet to create BATCH_JOB_EXECUTION table -->
+    <changeSet id="2" author="system_batch">
+        <createTable tableName="BATCH_JOB_EXECUTION">
+            <column name="JOB_EXECUTION_ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT"/>
+            <column name="JOB_INSTANCE_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATE_TIME" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="START_TIME" type="TIMESTAMP"/>
+            <column name="END_TIME" type="TIMESTAMP"/>
+            <column name="STATUS" type="VARCHAR(10)"/>
+            <column name="EXIT_CODE" type="VARCHAR(2500)"/>
+            <column name="EXIT_MESSAGE" type="VARCHAR(2500)"/>
+            <column name="LAST_UPDATED" type="TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="JOB_INST_EXEC_FK"
+                baseTableName="BATCH_JOB_EXECUTION"
+                baseColumnNames="JOB_INSTANCE_ID"
+                referencedTableName="BATCH_JOB_INSTANCE"
+                referencedColumnNames="JOB_INSTANCE_ID"/>
+    </changeSet>
+
+    <!-- ChangeSet to create BATCH_JOB_EXECUTION_PARAMS table -->
+    <changeSet id="3" author="system_batch">
+        <createTable tableName="BATCH_JOB_EXECUTION_PARAMS">
+            <column name="JOB_EXECUTION_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARAMETER_NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARAMETER_TYPE" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="PARAMETER_VALUE" type="VARCHAR(2500)"/>
+            <column name="IDENTIFYING" type="CHAR(1)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="JOB_EXEC_PARAMS_FK"
+                baseTableName="BATCH_JOB_EXECUTION_PARAMS"
+                baseColumnNames="JOB_EXECUTION_ID"
+                referencedTableName="BATCH_JOB_EXECUTION"
+                referencedColumnNames="JOB_EXECUTION_ID"/>
+    </changeSet>
+
+    <!-- ChangeSet to create BATCH_STEP_EXECUTION table -->
+    <changeSet id="4" author="system_batch">
+        <createTable tableName="BATCH_STEP_EXECUTION">
+            <column name="STEP_EXECUTION_ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="VERSION" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="STEP_NAME" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="JOB_EXECUTION_ID" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATE_TIME" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="START_TIME" type="TIMESTAMP"/>
+            <column name="END_TIME" type="TIMESTAMP"/>
+            <column name="STATUS" type="VARCHAR(10)"/>
+            <column name="COMMIT_COUNT" type="BIGINT"/>
+            <column name="READ_COUNT" type="BIGINT"/>
+            <column name="FILTER_COUNT" type="BIGINT"/>
+            <column name="WRITE_COUNT" type="BIGINT"/>
+            <column name="READ_SKIP_COUNT" type="BIGINT"/>
+            <column name="WRITE_SKIP_COUNT" type="BIGINT"/>
+            <column name="PROCESS_SKIP_COUNT" type="BIGINT"/>
+            <column name="ROLLBACK_COUNT" type="BIGINT"/>
+            <column name="EXIT_CODE" type="VARCHAR(2500)"/>
+            <column name="EXIT_MESSAGE" type="VARCHAR(2500)"/>
+            <column name="LAST_UPDATED" type="TIMESTAMP"/>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="JOB_EXEC_STEP_FK"
+                baseTableName="BATCH_STEP_EXECUTION"
+                baseColumnNames="JOB_EXECUTION_ID"
+                referencedTableName="BATCH_JOB_EXECUTION"
+                referencedColumnNames="JOB_EXECUTION_ID"/>
+    </changeSet>
+
+    <!-- ChangeSet to create BATCH_STEP_EXECUTION_CONTEXT table -->
+    <changeSet id="5" author="system_batch">
+        <createTable tableName="BATCH_STEP_EXECUTION_CONTEXT">
+            <column name="STEP_EXECUTION_ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="SHORT_CONTEXT" type="VARCHAR(2500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERIALIZED_CONTEXT" type="TEXT"/>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="STEP_EXEC_CTX_FK"
+                baseTableName="BATCH_STEP_EXECUTION_CONTEXT"
+                baseColumnNames="STEP_EXECUTION_ID"
+                referencedTableName="BATCH_STEP_EXECUTION"
+                referencedColumnNames="STEP_EXECUTION_ID"/>
+    </changeSet>
+
+    <!-- ChangeSet to create BATCH_JOB_EXECUTION_CONTEXT table -->
+    <changeSet id="6" author="system_batch">
+        <createTable tableName="BATCH_JOB_EXECUTION_CONTEXT">
+            <column name="JOB_EXECUTION_ID" type="BIGINT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="SHORT_CONTEXT" type="VARCHAR(2500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="SERIALIZED_CONTEXT" type="TEXT"/>
+        </createTable>
+        <addForeignKeyConstraint
+                constraintName="JOB_EXEC_CTX_FK"
+                baseTableName="BATCH_JOB_EXECUTION_CONTEXT"
+                baseColumnNames="JOB_EXECUTION_ID"
+                referencedTableName="BATCH_JOB_EXECUTION"
+                referencedColumnNames="JOB_EXECUTION_ID"/>
+    </changeSet>
+
+    <!-- ChangeSet to create sequences -->
+    <changeSet id="7" author="system_batch">
+        <createSequence sequenceName="BATCH_STEP_EXECUTION_SEQ" maxValue="9223372036854775807" cycle="false"/>
+        <createSequence sequenceName="BATCH_JOB_EXECUTION_SEQ" maxValue="9223372036854775807" cycle="false"/>
+        <createSequence sequenceName="BATCH_JOB_SEQ" maxValue="9223372036854775807" cycle="false"/>
+    </changeSet>
+
+</databaseChangeLog>

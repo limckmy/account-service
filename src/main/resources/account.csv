@@ -1,0 +1,21 @@
+account_id,account_number,account_type,account_description, balance,customer_id
+1,ACC1001,Savings,Primary saving account,5000.00,1
+2,ACC1002,Checking,Personal checking account,1500.00,1
+3,ACC1003,Savings,Emergency fund savings,10000.00,2
+4,ACC1004,Checking,Joint checking account,2500.00,3
+5,ACC1005,Savings,Vacation fund savings,12000.00,4
+6,ACC1006,Checking,Student checking account,3000.00,5
+7,ACC1007,Savings,Retirement savings account,8000.00,1
+8,ACC1008,Checking,Daily expenses checking account,2200.50,2
+9,ACC1009,Savings,Home down payment savings,15000.00,3
+10,ACC1010,Checking,Freelance income checking,3500.00,4
+11,ACC1011,Savings,College fund savings,5000.00,5
+12,ACC1012,Checking,Emergency fund checking account,1800.00,1
+13,ACC1013,Savings,Travel fund savings,6500.00,2
+14,ACC1014,Checking,Investment account checking,4700.25,3
+15,ACC1015,Savings,Wedding savings account,12000.00,4
+16,ACC1016,Checking,Small business checking account,4000.00,5
+17,ACC1017,Savings,Kids education savings,9500.75,1
+18,ACC1018,Checking,Personal savings and checking,2800.50,2
+19,ACC1019,Savings,Health emergency fund,20000.00,3
+20,ACC1020,Checking,Retirement fund checking,1500.00,4
