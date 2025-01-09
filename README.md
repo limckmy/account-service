@@ -50,8 +50,8 @@ java -jar target/account-service-1.0-SNAPSHOT.jar
 ```
 
 ### 3. Batch Job Execution 
-The batch job will automatically run at midnight every day (12 AM) and process the CSV files ([customer.csv](.\src\main\resources\customer.csv) and [account.csv](.\src\main\resources\account.csv)).
-Use a [Property](.\src\main\resources\application.properties) to Enable Immediate Execution 
+The batch job will automatically run at midnight every day (12 AM) and process the CSV files ([customer.csv](src/main/resources/customer.csv) and [account.csv](src/main/resources/account.csv)).
+Use a [Property](src/main/resources/application.properties) to Enable Immediate Execution 
 ```properties
 batch.job.run-immediately=true
 ```
