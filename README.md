@@ -33,7 +33,7 @@ git clone https://github.com/yourusername/your-repository.git
 cd your-repository
 ```
 ### 2. Configure Application Properties
-[application.properties](.\src\main\resources\application.properties)
+[application.properties](src/main/resources/application.properties)
 
 ### 3. Install Dependencies
 ```bash
