@@ -1,63 +1,81 @@
 package org.limckmy.account.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.limckmy.account.configuration.SecurityConfig;
+import org.limckmy.account.exception.ApiError;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
+@Slf4j
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     private final JWTUtil jwtUtil;
 
-    private final UserDetailsService userDetailsService;
-
-    public JWTAuthenticationFilter(UserDetailsService userDetailsService, JWTUtil jwtUtil) {
-        this.userDetailsService = userDetailsService;
+    public JWTAuthenticationFilter(JWTUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
+    }
+
+    private boolean isWhiltelisted(String uri) {
+        for (String path : SecurityConfig.WHITELIST) {
+            if (uri.contains(path)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        if (isWhiltelisted(request.getRequestURI())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
-        String jwt = null;
+        Claims claims = null;
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7);
+            String jwt = authorizationHeader.substring(7);
             try {
-                Claims claims = jwtUtil.extractClaims(jwt);
+                claims = jwtUtil.extractClaims(jwt);
                 username = claims.getSubject();
-            } finally {
-                if (username == null) {
-
-                }
+            } catch (Exception e) {
+                log.error("Error validating JWT token: {}", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED, "Unauthorized", "The provided token is either invalid, expired, or missing. Please ensure you are using a valid token and try again.");
+                ObjectMapper mapper = new ObjectMapper(); String json = mapper.writeValueAsString(apiError);
+                response.getWriter().write(json);
+                response.getWriter().flush();
+                response.getWriter().close();
+                return;
             }
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-            if (!jwtUtil.isTokenExpired(jwt)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-        }
+        List<GrantedAuthority> authorities = jwtUtil.getAuthoritiesFromToken(claims);
+        UsernamePasswordAuthenticationToken authToken =
+                new UsernamePasswordAuthenticationToken(username, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authToken);
 
         filterChain.doFilter(request, response);
     }

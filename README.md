@@ -175,5 +175,7 @@ Response :
   - [Entity](documentation/class-diagram/entity.png)
   - [MVC](documentation/class-diagram/mvc.png)
 - [Activity Diagram](documentation/activity-diagram.png)
+- [JMeter](account-service.jmx)
 - [Postman Collection](Account%20Service.postman_collection.json)
 - [OpenAPI](openapi.json)
+- [Swagger UI](http://localhost:8080/openapi/swagger-ui.html)

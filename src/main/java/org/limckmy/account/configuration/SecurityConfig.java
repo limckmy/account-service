@@ -7,16 +7,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+    public static final String[] WHITELIST = {"/v1/users/register", "/v1/users/login", "/openapi/**"};
 
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
@@ -29,10 +27,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/v1/users/register","/v1/users/login", "/openapi/**").permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers(WHITELIST).permitAll().anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            throw new RuntimeException("User not found");
+        };
     }
 
 

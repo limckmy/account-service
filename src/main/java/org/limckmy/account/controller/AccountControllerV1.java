@@ -18,7 +18,7 @@ public class AccountControllerV1 {
         this.accountService = accountService;
     }
 
-    @GetMapping("/search")
+    @GetMapping("")
     public ResponseEntity<?> findAccount(@RequestParam(value = "customerId", required = false) Long customerId,
                                          @RequestParam(value = "accountNumber", required = false) String accountNumber,
                                          @RequestParam(value = "description", required = false) String description,
