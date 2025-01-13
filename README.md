@@ -96,7 +96,7 @@ Response :
 
 #### 1. Search Account
 ```bash
-GET /v1/accounts/search?customerId=1&accountNumber=ACC1001&description=checking&page=0&size=5
+GET /v1/accounts?customerId=1&accountNumber=ACC1001&description=checking&page=0&size=5
 Authorization: Bearer your_jwt_token
 ```
 Response :
