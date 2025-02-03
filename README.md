@@ -22,6 +22,20 @@ Ensure you have the following installed on your system:
 - Maven (for building the project)
 - A relational database (PostgreSQL) for data storage
 
+## Postgres
+See [docker-compose.yml](docker-compose.yml)
+- Run ``docker-compose up``
+- PgAdmin web console : localhost:5050 
+  - login 
+    - email : admin@limckmy.org  
+    - password : admin
+  - register server 
+    - hostname : postgres_db
+    - port : 5432
+    - database : account
+    - username : postgres
+    - password : password
+
 ## Setup
 
 ### 1. Clone the Repository
